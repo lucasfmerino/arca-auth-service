@@ -47,7 +47,7 @@ public class TokenService
      * VALIDATE TOKEN (GET SUBJECT)
      *
      */
-    public String validateToken(String token)
+    public String validateTokenSubject(String token)
     {
         try
         {
