@@ -4,6 +4,7 @@ import com.arca.auth_service.modules.user.domain.dto.UserDisplayDto;
 import com.arca.auth_service.modules.user.domain.dto.UserPasswordUpdateDto;
 import com.arca.auth_service.modules.user.domain.dto.UserUpdateDto;
 import com.arca.auth_service.modules.user.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-//@SecurityRequirement(name = "bearer-key")
+@SecurityRequirement(name = "bearer-key")
 @RequestMapping("/api/users")
 public class UserController
 {
