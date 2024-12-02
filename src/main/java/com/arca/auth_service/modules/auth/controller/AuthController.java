@@ -1,14 +1,20 @@
 package com.arca.auth_service.modules.auth.controller;
 
+import com.arca.auth_service.modules.auth.domain.TokenDto;
 import com.arca.auth_service.modules.auth.service.AuthService;
+import com.arca.auth_service.modules.auth.service.SetupService;
 import com.arca.auth_service.modules.auth.service.TokenService;
 import com.arca.auth_service.modules.user.domain.dto.UserDisplayDto;
 import com.arca.auth_service.modules.user.domain.dto.UserLoginDto;
 import com.arca.auth_service.modules.user.domain.dto.UserRegistrationDto;
+import com.arca.auth_service.modules.user.domain.model.User;
 import com.arca.auth_service.modules.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +33,15 @@ public class AuthController
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private SetupService setupService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
 
     /*
@@ -55,7 +70,7 @@ public class AuthController
     @Transactional
     public ResponseEntity<?> start()
     {
-        return ResponseEntity.ok(authService.start());
+        return ResponseEntity.ok(setupService.start());
     }
 
 
@@ -66,9 +81,13 @@ public class AuthController
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginDto userLoginDto)
     {
+        UsernamePasswordAuthenticationToken authToken = authService.generateAuthToken(userLoginDto);
+
         try
         {
-            return ResponseEntity.ok(authService.login(userLoginDto));
+            Authentication authentication = authenticationManager.authenticate(authToken);
+            String tokenJWT = tokenService.generateToken((User) authentication.getPrincipal());
+            return ResponseEntity.ok(new TokenDto(tokenJWT));
         }
         catch (Exception e)
         {
